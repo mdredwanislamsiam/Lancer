@@ -6,6 +6,6 @@ class ServiceFilter(FilterSet):
     class Meta: 
         model = Service 
         fields = {
-            'price': ['lte', 'gte'], 
+            'price': ['gte', 'lte'],
             'category_id': ['exact'], 
         }

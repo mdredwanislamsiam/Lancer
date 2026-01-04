@@ -8,14 +8,14 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from services.filters import ServiceFilter
 from rest_framework.pagination import PageNumberPagination
-
+from services.permissions import IsSellerOrReadOnly, IsBuyerOrReadOnly
 
 
 
 class ServiceViewSet(ModelViewSet): 
     queryset = Service.objects.select_related('category').select_related('seller').all()
     serializer_class = ServiceSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsSellerOrReadOnly]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = ServiceFilter
     search_fields = ['title']
@@ -78,7 +78,11 @@ class ServiceViewSet(ModelViewSet):
 class CategoryViewSet(ModelViewSet):
     queryset = Category.objects.annotate(service_count=Count('services')).all()
     serializer_class = CategorySerializer
-    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_permissions(self):
+        if self.request.method in permissions.SAFE_METHODS: 
+            return [permissions.AllowAny()]
+        return [permissions.IsAdminUser()]
     
     @swagger_auto_schema(
         operation_summary="List categories",
@@ -131,8 +135,7 @@ class CategoryViewSet(ModelViewSet):
     
 class ReviewViewSet(ModelViewSet): 
     serializer_class = ReviewSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    
+    permission_classes = [permissions.IsAuthenticated, IsBuyerOrReadOnly]
     
     @swagger_auto_schema(
         operation_summary="List service reviews",

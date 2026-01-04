@@ -8,6 +8,7 @@ from rest_framework.decorators import action
 from orders.services import OrderServices
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from users.models import User
     
     
 class OrderViewSet(ModelViewSet): 
@@ -43,7 +44,6 @@ class OrderViewSet(ModelViewSet):
     def update_status(self, request, pk = None): 
         order = self.get_object()
         old_status = order.status
-        
         serializer = UpdateOrderSerializer(order, data = request.data, partial = True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -70,16 +70,19 @@ class OrderViewSet(ModelViewSet):
     
     def get_queryset(self):
         if getattr(self, 'swagger_fake_view', False):
-            return Notification.objects.none()
-        if self.request.user.is_staff : 
-            return Order.objects.select_related('service').all()
-        return Order.objects.select_related('service').filter(buyer = self.request.user)
-    
+            return Order.objects.none()
+        queryset = Order.objects.select_related('service', 'service__seller')
+        if self.request.user.is_staff:
+            return queryset
+        if self.request.user.role == User.BUYER:
+            return queryset.filter(buyer=self.request.user)
+        return queryset.filter(service__seller=self.request.user)
+        
     def get_serializer_context(self):
         return {'user_id': self.request.user.id}
     
     def get_permissions(self):
-        if self.action in ['update_status', 'destroy']: 
+        if self.action in ['update_status', 'destroy', 'partial_update']: 
             return [permissions.IsAdminUser()]
         return [permissions.IsAuthenticated()]
     
