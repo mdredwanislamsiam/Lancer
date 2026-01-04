@@ -9,7 +9,7 @@ class OrderServices:
     def cancel_order(order, user): 
         with transaction.atomic(): 
             if user.is_staff: 
-                order.status == Order.CANCELED
+                order.status = Order.CANCELED
                 message_for_seller = f"Order {order.id} has been canceled"
                 message_for_buyer = f"Your order for {order.service.title} has been canceled"
                 OrderServices.create_notification(

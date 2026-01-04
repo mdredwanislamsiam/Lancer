@@ -56,7 +56,7 @@ class OrderViewSet(ModelViewSet):
             OrderServices.create_notification(
                 user=order.service.seller, message=message_for_seller)
         
-        return Response({'status': f'Order status updated to {request.data['status']}'})
+        return Response({'status': f'Order status updated to {request.data.get('status')}'})
     
     
     def get_serializer_class(self):
@@ -73,7 +73,7 @@ class OrderViewSet(ModelViewSet):
             return Notification.objects.none()
         if self.request.user.is_staff : 
             return Order.objects.select_related('service').all()
-        return Order.objects.select_related('service').filter(user = self.request.user)
+        return Order.objects.select_related('service').filter(buyer = self.request.user)
     
     def get_serializer_context(self):
         return {'user_id': self.request.user.id}

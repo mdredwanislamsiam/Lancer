@@ -35,17 +35,19 @@ class ServiceSerializer(serializers.ModelSerializer):
     
     
     def create(self, validated_data):
-        weeks = validated_data.pop('delivery_weeks')
-        days = validated_data.pop('delivery_days')
-        hours = validated_data.pop('delivery_hours')
-        validated_data['delivery_time'] = timedelta(weeks=weeks, days=days, hours=hours)
+        weeks = validated_data.pop('delivery_weeks', 0)
+        days = validated_data.pop('delivery_days', 0)
+        hours = validated_data.pop('delivery_hours', 0)
+        if weeks or days or hours:
+            validated_data['delivery_time'] = timedelta(weeks=weeks, days=days, hours=hours)
         return super().create(validated_data)
         
     def update(self, instance, validated_data):
-        weeks = validated_data.pop('delivery_weeks')
-        days = validated_data.pop('delivery_days')
-        hours = validated_data.pop('delivery_hours')
-        validated_data['delivery_time'] = timedelta(weeks=weeks, days=days, hours=hours)
+        weeks = validated_data.pop('delivery_weeks', 0)
+        days = validated_data.pop('delivery_days', 0)
+        hours = validated_data.pop('delivery_hours', 0)
+        if weeks or days or hours: 
+            validated_data['delivery_time'] = timedelta(weeks=weeks, days=days, hours=hours)
         return super().update(instance, validated_data)
     
     def get_delivery_time(self, obj): 

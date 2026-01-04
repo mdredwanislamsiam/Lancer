@@ -10,12 +10,12 @@ class Order(models.Model):
     PAID = 'Paid'
     ACTIVE = 'Active'
     CANCELED = 'Canceled'
-    STATUS_CHOICES = {
+    STATUS_CHOICES = (
         (NOT_PAID, 'Not paid'),
         (PAID, 'Paid'),
         (ACTIVE, 'Active'),
         (CANCELED, 'Canceled'),
-    }
+    )
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='service')
     buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=NOT_PAID)
@@ -24,7 +24,7 @@ class Order(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return f"Order {self.id} by {self.user.username} - {self.status}"
+        return f"Order {self.id} by {self.buyer.username} - {self.status}"
 
     
 
