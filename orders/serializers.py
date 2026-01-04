@@ -9,7 +9,7 @@ from orders.services import OrderServices
 class SimpleServiceSerializer(serializers.ModelSerializer): 
     class Meta: 
         model = Service
-        fields = ['id', 'title', 'price']
+        fields = ['id', 'title', 'price', 'seller', 'delivery_time']
         
         
 
