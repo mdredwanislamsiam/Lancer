@@ -9,7 +9,7 @@ from orders.services import OrderServices
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from users.models import User
-    
+from services.permissions import IsBuyerOrReadOnly
     
 class OrderViewSet(ModelViewSet): 
     http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
@@ -84,6 +84,10 @@ class OrderViewSet(ModelViewSet):
     def get_permissions(self):
         if self.action in ['update_status', 'destroy', 'partial_update']: 
             return [permissions.IsAdminUser()]
+        if self.action == 'cancel': 
+            return [permissions.IsAuthenticated()]
+        if self.action == 'create': 
+            return [IsBuyerOrReadOnly()]
         return [permissions.IsAuthenticated()]
     
     

@@ -8,23 +8,16 @@ class OrderServices:
     @staticmethod
     def cancel_order(order, user): 
         with transaction.atomic(): 
-            if user.is_staff: 
-                order.status = Order.CANCELED
-                message_for_seller = f"Order {order.id} has been canceled"
-                message_for_buyer = f"Your order for {order.service.title} has been canceled"
-                OrderServices.create_notification(
-                    user=order.buyer, message=message_for_buyer)
-                OrderServices.create_notification(
-                    user=order.service.seller, message=message_for_seller)
-                order.save()
-            if order.buyer != user: 
+            if user != order.buyer and user  != order.service.seller and not user.is_staff: 
                 raise PermissionDenied({
-                    'detail': 'You can only cancel your own orders'
+                    'detail': 'You are not allowed to cancel this order'
                 })
-            if (order.status == Order.ACTIVE or order.status == Order.PAID): 
+            
+            if order.status in [Order.ACTIVE, Order.PAID]: 
                 raise ValidationError({
-                    'detail': 'This order can not be canceled at this moment. Please contact the Admin for further information.'
+                    'detail': 'This order cannot be canceled at this moment. Please contact admin for other ways.'
                 })
+            
             order.status = Order.CANCELED
             order.save()
             message_for_seller = f"Order {order.id} has been canceled"
@@ -34,7 +27,6 @@ class OrderServices:
             OrderServices.create_notification(
                 user=order.service.seller, message=message_for_seller)
             return order
-    
     
     @staticmethod
     def create_notification(user, message): 
