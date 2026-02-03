@@ -1,6 +1,6 @@
 from rest_framework_nested import routers
 from django.urls import path, include
-from services.views import ServiceViewSet, ReviewViewSet, CategoryViewSet
+from services.views import ServiceViewSet, ReviewViewSet, CategoryViewSet, ServiceImageViewSet
 from orders.views import OrderViewSet, NotificatinViewSet
 
 router = routers.DefaultRouter()
@@ -13,7 +13,7 @@ router.register('notifications', NotificatinViewSet, basename='notifications')
 
 service_router = routers.NestedDefaultRouter(router, 'services', lookup = 'service')
 service_router.register('reviews', ReviewViewSet, basename='service-review')
-
+service_router.register('images', ServiceImageViewSet, basename='service-image')
 
 
 

@@ -1,7 +1,7 @@
 from django.db import models
 from users.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
-
+from cloudinary.models import CloudinaryField
 
 
 class Category(models.Model): 
@@ -20,10 +20,13 @@ class Service(models.Model):
     seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name='services')
     service_requirements = models.TextField()
     delivery_time = models.DurationField()
-    
     def __str__(self):
         return self.title
     
+class ServiceImage(models.Model):
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name="images")
+    # images = models.ImageField(upload_to='services/images/')
+    images = CloudinaryField('images')
     
 class Review(models.Model): 
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='reviews')

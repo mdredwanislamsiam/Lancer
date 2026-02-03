@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 from decouple import config
-
+import cloudinary
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -27,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-i@3%y0cxeokd#owniiwna5w*dgm5nxytv$2$-*qrtu4@-rhy^g'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['.vercel.app', '127.0.0.1']
 
@@ -116,6 +116,24 @@ INTERNAL_IPS = [
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
+
+# configuration for Cloudinary 
+
+cloudinary.config(
+    cloud_name=config("cloud_name"),
+    api_key=config("api_key"),
+    # Click 'View API Keys' above to copy your API secret
+    api_secret=config("api_secret"),
+    secure=True
+)
+
+
+# Media Storage Setting
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR/'media'
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {

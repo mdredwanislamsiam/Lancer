@@ -1,4 +1,4 @@
-from services.models import Service, Category, Review
+from services.models import Service, Category, Review, ServiceImage
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from datetime import timedelta
@@ -58,6 +58,13 @@ class ServiceSerializer(serializers.ModelSerializer):
         
         return f"{weeks:02d} weeks {days:02d} days {hours:02d} hours"
     
+
+
+class ServiceImageSerializer(serializers.ModelSerializer): 
+    images = serializers.ImageField()
+    class Meta: 
+       model = ServiceImage 
+       fields = ['id', 'images']     
 
 
 class ReviewSerializer(serializers.ModelSerializer): 

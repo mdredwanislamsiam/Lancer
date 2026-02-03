@@ -1,7 +1,7 @@
 from drf_yasg.utils import swagger_auto_schema
-from services.models import Service, Review, Category
+from services.models import Service, Review, Category, ServiceImage
 from rest_framework.viewsets import ModelViewSet 
-from services.serializers import ServiceSerializer, ReviewSerializer, CategorySerializer
+from services.serializers import ServiceSerializer, ReviewSerializer, CategorySerializer, ServiceImageSerializer
 from django.db.models import Count
 from rest_framework import permissions
 from django_filters.rest_framework import DjangoFilterBackend
@@ -9,7 +9,7 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from services.filters import ServiceFilter
 from rest_framework.pagination import PageNumberPagination
 from services.permissions import IsSellerOrReadOnly, IsBuyerOrReadOnly
-
+from rest_framework.exceptions import NotFound
 
 
 class ServiceViewSet(ModelViewSet): 
@@ -130,7 +130,18 @@ class CategoryViewSet(ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)
 
+
+class ServiceImageViewSet(ModelViewSet): 
+    serializer_class = ServiceImageSerializer
     
+    def get_queryset(self):
+        service_id = self.kwargs.get("service_pk")
+        if not Service.objects.filter(id=service_id).exists():
+            raise NotFound("Service does not exist")
+        return ServiceImage.objects.prefetch_related('service').filter(service_id = service_id)
+
+    def perform_create(self, serializer):
+        serializer.save(service_id=self.kwargs.get("service_pk"))
     
     
 class ReviewViewSet(ModelViewSet): 
