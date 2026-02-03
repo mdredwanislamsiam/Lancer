@@ -4,7 +4,6 @@ cffi==2.0.0
 charset-normalizer==3.4.4
 cloudinary==1.44.1
 cryptography==46.0.3
-decouple==0.0.7
 defusedxml==0.7.1
 Django==6.0
 django-cloudinary-storage==0.3.0
