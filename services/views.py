@@ -69,7 +69,7 @@ class ServiceViewSet(ModelViewSet):
         return super().destroy(request, *args, **kwargs)
     
     def perform_create(self, serializer):
-        serializer.save(seller = self.request.user)
+        serializer.save(seller = self.request.user, count=0)
         
     def perform_update(self, serializer):
         serializer.save(seller = self.request.user)

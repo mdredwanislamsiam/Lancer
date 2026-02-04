@@ -20,6 +20,7 @@ class Service(models.Model):
     seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name='services')
     service_requirements = models.TextField()
     delivery_time = models.DurationField()
+    count = models.IntegerField()
     def __str__(self):
         return self.title
     

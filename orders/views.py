@@ -49,6 +49,8 @@ class OrderViewSet(ModelViewSet):
         serializer.save()
         
         if old_status != Order.PAID and order.status == Order.PAID: 
+            order.service.count += 1 
+            order.service.save()
             message_for_seller = f"Order {order.id} has been paid."
             message_for_buyer = f"Your order for {order.service.title} has been marked as PAID"
             OrderServices.create_notification(

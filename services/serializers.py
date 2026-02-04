@@ -31,7 +31,8 @@ class ServiceSerializer(serializers.ModelSerializer):
     seller = SimpleUserSerializer(read_only = True)
     class Meta: 
         model = Service 
-        fields = ['id', 'title', 'description', 'category', 'price', 'seller', 'service_requirements', 'delivery_weeks', 'delivery_days', 'delivery_hours', 'delivery_time']
+        fields = ['id', 'title', 'description', 'category', 'price', 'seller', 'service_requirements', 'delivery_weeks', 'delivery_days', 'delivery_hours', 'delivery_time', 'count']
+        read_only_fields = ['count']
     
     
     def create(self, validated_data):
