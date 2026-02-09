@@ -7,7 +7,7 @@ from djoser.serializers import UserCreateSerializer, UserSerializer
 class CustomUserCreateSerializer(UserCreateSerializer): 
     class Meta(UserCreateSerializer.Meta): 
         fields = ['id', 'username', 'first_name', 'last_name', 'email', 'password',
-                    'phone_number', 'address', 'bio', 'role']
+                    'phone_number', 'address', 'image', 'bio', 'role']
       
       
     def create(self, validated_data):
@@ -22,5 +22,5 @@ class CustomUserCreateSerializer(UserCreateSerializer):
 class CustomUserSerializer(UserSerializer):
     class Meta(UserSerializer.Meta):
         fields = ['id', 'username', 'first_name', 'last_name', 'email',
-                   'phone_number', 'address', 'bio', 'role']
+                   'phone_number', 'address', 'bio', 'image', 'role']
         ref_name = 'CustomUser'

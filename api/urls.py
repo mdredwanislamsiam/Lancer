@@ -1,7 +1,7 @@
 from rest_framework_nested import routers
 from django.urls import path, include
 from services.views import ServiceViewSet, ReviewViewSet, CategoryViewSet, ServiceImageViewSet
-from orders.views import OrderViewSet, NotificatinViewSet
+from orders.views import OrderViewSet, NotificatinViewSet, CanOrderService
 
 router = routers.DefaultRouter()
 router.register('services', ServiceViewSet, basename='services')
@@ -23,4 +23,5 @@ service_router.register('images', ServiceImageViewSet, basename='service-image')
 urlpatterns = [
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.jwt')),
+    path('orders/can_order/<int:service_id>', CanOrderService.as_view(), name='can-order')
 ] + router.urls + service_router.urls

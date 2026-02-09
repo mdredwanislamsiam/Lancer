@@ -10,11 +10,13 @@ class Order(models.Model):
     PAID = 'Paid'
     ACTIVE = 'Active'
     CANCELED = 'Canceled'
+    DELIVERED = 'Delivered'
     STATUS_CHOICES = (
         (NOT_PAID, 'Not paid'),
         (PAID, 'Paid'),
         (ACTIVE, 'Active'),
         (CANCELED, 'Canceled'),
+        (DELIVERED,'Delivered')
     )
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='orders')
     buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')

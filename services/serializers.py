@@ -11,7 +11,10 @@ class SimpleUserSerializer(serializers.ModelSerializer):
         fields = ['id', 'username']
         read_only_fields = ['username']
 
-
+class DetailUserSerializer(serializers.ModelSerializer): 
+    class Meta: 
+        model = get_user_model(); 
+        fields = ['id', 'username', 'first_name', 'last_name', 'image', 'email', 'phone_number', 'address', 'bio', 'role']
 
 class CategorySerializer(serializers.ModelSerializer): 
     class Meta: 
@@ -20,18 +23,25 @@ class CategorySerializer(serializers.ModelSerializer):
         
     service_count = serializers.IntegerField(read_only = True)
     
-    
+
+class ServiceImageSerializer(serializers.ModelSerializer):
+    images = serializers.ImageField()
+
+    class Meta:
+       model = ServiceImage
+       fields = ['id', 'images']
      
 class ServiceSerializer(serializers.ModelSerializer):
     delivery_weeks = serializers.IntegerField(write_only =True)
     delivery_days = serializers.IntegerField(write_only = True)
     delivery_hours = serializers.IntegerField(write_only = True)
-    
     delivery_time = serializers.SerializerMethodField(read_only = True)
-    seller = SimpleUserSerializer(read_only = True)
+    category = CategorySerializer(read_only = True)
+    seller = DetailUserSerializer(read_only = True)
+    images = ServiceImageSerializer(many = True, read_only = True)
     class Meta: 
         model = Service 
-        fields = ['id', 'title', 'description', 'category', 'price', 'seller', 'service_requirements', 'delivery_weeks', 'delivery_days', 'delivery_hours', 'delivery_time', 'count']
+        fields = ['id', 'title', 'description', 'category', 'price', 'seller', 'images', 'service_requirements', 'delivery_weeks', 'delivery_days', 'delivery_hours', 'delivery_time', 'count']
         read_only_fields = ['count']
     
     
@@ -60,12 +70,7 @@ class ServiceSerializer(serializers.ModelSerializer):
         return f"{weeks:02d} weeks {days:02d} days {hours:02d} hours"
     
 
-
-class ServiceImageSerializer(serializers.ModelSerializer): 
-    images = serializers.ImageField()
-    class Meta: 
-       model = ServiceImage 
-       fields = ['id', 'images']     
+  
 
 
 class ReviewSerializer(serializers.ModelSerializer): 

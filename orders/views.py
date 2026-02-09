@@ -10,6 +10,8 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from users.models import User
 from services.permissions import IsBuyerOrReadOnly
+from rest_framework.views import APIView
+
     
 class OrderViewSet(ModelViewSet): 
     http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
@@ -107,6 +109,7 @@ class OrderViewSet(ModelViewSet):
         responses={201: OrderSerializer}
     )
     def create(self, request, *args, **kwargs):
+        
         return super().create(request, *args, **kwargs)
 
     @swagger_auto_schema(
@@ -179,3 +182,19 @@ class NotificatinViewSet(ModelViewSet):
         if getattr(self, 'swagger_fake_view', False): 
             return Notification.objects.none()
         return Notification.objects.select_related('user').filter(user = self.request.user).order_by("-created_at")
+    
+    
+    
+    
+
+class CanOrderService(APIView): 
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get(self, request, service_id): 
+        user = request.user
+        order = Order.objects.filter(buyer = user, service_id = service_id).first()
+        can_order = False; 
+        if ((order and order.status == Order.DELIVERED) or (order == None)):
+            can_order = True; 
+
+        return Response({"can_order": can_order})
