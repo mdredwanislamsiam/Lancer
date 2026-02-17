@@ -10,10 +10,12 @@ from services.filters import ServiceFilter
 from rest_framework.pagination import PageNumberPagination
 from services.permissions import IsSellerOrReadOnly, IsBuyerOrReadOnly
 from rest_framework.exceptions import NotFound
-
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.generics import ListAPIView
 
 class ServiceViewSet(ModelViewSet): 
-    queryset = Service.objects.select_related('category').select_related('seller').all()
+    queryset = Service.objects.select_related('category', 'seller').prefetch_related('images').all()
     serializer_class = ServiceSerializer
     permission_classes = [permissions.IsAuthenticated, IsSellerOrReadOnly]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
@@ -81,7 +83,7 @@ class CategoryViewSet(ModelViewSet):
     
     def get_permissions(self):
         if self.request.method in permissions.SAFE_METHODS: 
-            return [permissions.AllowAny()]
+            return [permissions.IsAuthenticated()]
         return [permissions.IsAdminUser()]
     
     @swagger_auto_schema(
@@ -133,7 +135,7 @@ class CategoryViewSet(ModelViewSet):
 
 class ServiceImageViewSet(ModelViewSet): 
     serializer_class = ServiceImageSerializer
-    
+    permission_classes = [permissions.IsAuthenticated]
     def get_queryset(self):
         service_id = self.kwargs.get("service_pk")
         if not Service.objects.filter(id=service_id).exists():
@@ -205,3 +207,43 @@ class ReviewViewSet(ModelViewSet):
     def perform_update(self, serializer):
         serializer.save(user=self.request.user)
 
+
+class MyServices(ListAPIView):
+    serializer_class = ServiceSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    pagination_class = PageNumberPagination
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_class = ServiceFilter
+    search_fields = ['title']
+    ordering_fields = ['price']
+
+    def get_queryset(self):
+        return Service.objects.select_related('category', 'seller').prefetch_related("images").filter(seller=self.request.user)
+
+
+class HasReviewed(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, service_id):
+        user = request.user
+        has_reviewed = Review.objects.filter(
+            user=user, service_id= service_id).exists()
+        return Response({"has_reviewed": has_reviewed})
+
+
+class GetCategoricalServices(APIView): 
+    def get(self, request, category_id): 
+        services = Service.objects.select_related('category', 'seller').prefetch_related("images").filter(category_id=category_id)[:5]
+        cateogory = Category.objects.get(id = category_id)
+        serviceSerializer = ServiceSerializer(services, many=True)
+        categorySerilizer = CategorySerializer(cateogory)
+        return Response({"services" : serviceSerializer.data, "category": categorySerilizer.data})
+    
+
+class GetReviews(APIView): 
+    def get(self, request): 
+        reviews = Review.objects.all()[0:6];
+        serializer = ReviewSerializer(reviews, many = True) 
+        return Response({"reviews" : serializer.data})
+    
+ 

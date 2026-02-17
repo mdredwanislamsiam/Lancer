@@ -2,8 +2,8 @@ from rest_framework import serializers
 from orders.models import Order, Notification
 from services.models import Service
 from orders.services import OrderServices
-
-
+from services.serializers import ServiceSerializer
+from users.serializers import CustomUserSerializer
 
 
 class SimpleServiceSerializer(serializers.ModelSerializer): 
@@ -14,7 +14,8 @@ class SimpleServiceSerializer(serializers.ModelSerializer):
         
 
 class OrderSerializer(serializers.ModelSerializer):
-    service = SimpleServiceSerializer()
+    service = ServiceSerializer()
+    buyer = CustomUserSerializer()
     class Meta: 
         model = Order
         fields = ['id', 'buyer', 'status', 'service', 'total_price', 'created_at', 'updated_at']
@@ -23,6 +24,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class CreateOrderSerializer(serializers.Serializer): 
     service_id = serializers.IntegerField()
+ 
     
     def validate_service_id(self, service_id): 
         if not Service.objects.filter(pk = service_id).exists(): 
@@ -32,17 +34,20 @@ class CreateOrderSerializer(serializers.Serializer):
         return service_id
     
     def create(self, validated_data): 
-        user_id = self.context['user_id']
+        user = self.context["user"]
         service_id = validated_data['service_id']
         
         service = Service.objects.get(pk = service_id)
         total_price = service.price
-        order = Order.objects.create(buyer_id = user_id, total_price= total_price, service= service)
+        order = Order.objects.create(buyer = user, total_price= total_price, service= service)
         
         message_for_seller = f"A new order was is made by {order.buyer} for the {service.title} service. Wait for the payment." 
         message_for_buyer = f"To confirm Your order for {service.title} Please Proceed with the payment. Your bill is ${total_price}."
-        OrderServices.create_notification(user = order.buyer, message= message_for_buyer)
-        OrderServices.create_notification(user= service.seller, message= message_for_seller)
+        title = "Order Confirmation"
+        OrderServices.create_notification(
+            user=order.buyer, message=message_for_buyer, title=title)
+        OrderServices.create_notification(
+            user=order.service.seller, message=message_for_seller, title=title)
         
         return order
 
@@ -65,11 +70,5 @@ class EmptySerializer(serializers.Serializer):
 class NotificationSerializer(serializers.ModelSerializer): 
     class Meta: 
         model = Notification
-        fields = ['id', 'message', 'is_read', 'created_at']
+        fields = ['id', 'title', 'message', 'is_read', 'created_at']
         
-    
-    
-class UpdateNotificationSerializer(serializers.ModelSerializer): 
-    class Meta: 
-        model = Notification
-        fields = ['is_read']

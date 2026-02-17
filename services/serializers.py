@@ -36,12 +36,20 @@ class ServiceSerializer(serializers.ModelSerializer):
     delivery_days = serializers.IntegerField(write_only = True)
     delivery_hours = serializers.IntegerField(write_only = True)
     delivery_time = serializers.SerializerMethodField(read_only = True)
-    category = CategorySerializer(read_only = True)
+    category = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all(),   
+        write_only=True
+    )
+
+    category_detail = CategorySerializer(
+        source="category",             
+        read_only=True
+    )
     seller = DetailUserSerializer(read_only = True)
     images = ServiceImageSerializer(many = True, read_only = True)
     class Meta: 
         model = Service 
-        fields = ['id', 'title', 'description', 'category', 'price', 'seller', 'images', 'service_requirements', 'delivery_weeks', 'delivery_days', 'delivery_hours', 'delivery_time', 'count']
+        fields = ['id', 'title', 'description', 'category', 'category_detail', 'price', 'seller', 'images', 'service_requirements', 'delivery_weeks', 'delivery_days', 'delivery_hours', 'delivery_time', 'count']
         read_only_fields = ['count']
     
     

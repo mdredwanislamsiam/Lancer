@@ -20,14 +20,15 @@ class OrderServices:
             
             order.status = Order.CANCELED
             order.save()
+            title = "Order Cancelation"
             message_for_seller = f"Order {order.id} has been canceled"
             message_for_buyer = f"Your order for {order.service.title} has been canceled"
             OrderServices.create_notification(
-                user=order.buyer, message=message_for_buyer)
+                user=order.buyer, message=message_for_buyer, title=title )
             OrderServices.create_notification(
-                user=order.service.seller, message=message_for_seller)
+                user=order.service.seller, message=message_for_seller, title=title)
             return order
     
     @staticmethod
-    def create_notification(user, message): 
-        return Notification.objects.create(user = user, message = message)
+    def create_notification(user, message, title): 
+        return Notification.objects.create(user = user, message = message, title=title)
