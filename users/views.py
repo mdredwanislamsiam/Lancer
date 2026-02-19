@@ -10,10 +10,10 @@ from services.serializers import ServiceSerializer
 from orders.serializers import OrderSerializer
 
 
-class PublicUserViewSet(ReadOnlyModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = CustomUserSerializer
-    permission_classes = [AllowAny]
+class PublicUserView(APIView):
+    def get(self, request, id): 
+        user = User.objects.get(id = id)
+        return Response ({'user': CustomUserSerializer(user).data})
 
 
 class IncomeOrCostPerMonthViewSet(APIView):

@@ -2,13 +2,12 @@ from rest_framework_nested import routers
 from django.urls import path, include
 from services.views import ServiceViewSet, ReviewViewSet, CategoryViewSet, ServiceImageViewSet, MyServices, HasReviewed, GetCategoricalServices, GetReviews
 from orders.views import OrderViewSet, NotificatinViewSet, CanOrderService, initiate_payment, payment_fail, payment_success, payment_cancel, UpdateNotification, HasOrderedProduct
-from users.views import PublicUserViewSet, IncomeOrCostPerMonthViewSet, OtherInfo
+from users.views import PublicUserView, IncomeOrCostPerMonthViewSet, OtherInfo
 
 
 
 router = routers.DefaultRouter()
 
-router.register('users', PublicUserViewSet, basename='users')
 router.register('services', ServiceViewSet, basename='services')
 router.register('categories', CategoryViewSet, basename='categories')
 # router.register('carts', CartViewSet, basename='carts')
@@ -42,5 +41,6 @@ urlpatterns = [
     path('categories/five_services/<int:category_id>', GetCategoricalServices.as_view(), name="categoy-services"),
     path('reviews', GetReviews.as_view(), name='reviews' ), 
     path('other_info', OtherInfo.as_view(), name='otherInfo' ), 
-    path('income_data', IncomeOrCostPerMonthViewSet.as_view(), name='income-data')
+    path('income_data', IncomeOrCostPerMonthViewSet.as_view(), name='income-data'), 
+    path('users/<int:id>', PublicUserView.as_view(), name= 'each-user'), 
 ] + router.urls + service_router.urls
