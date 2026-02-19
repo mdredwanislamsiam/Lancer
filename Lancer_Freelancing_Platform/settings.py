@@ -112,6 +112,7 @@ DATABASES = {
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173", 
+    "https://lancer-client-nine.vercel.app",
 ]
 
 INTERNAL_IPS = [
