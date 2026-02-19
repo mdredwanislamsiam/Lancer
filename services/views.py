@@ -17,12 +17,17 @@ from rest_framework.generics import ListAPIView
 class ServiceViewSet(ModelViewSet): 
     queryset = Service.objects.select_related('category', 'seller').prefetch_related('images').all()
     serializer_class = ServiceSerializer
-    permission_classes = [permissions.IsAuthenticated, IsSellerOrReadOnly]
+
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = ServiceFilter
     search_fields = ['title']
     ordering_fields = ['price']
     pagination_class = PageNumberPagination
+    
+    def get_permissions(self):
+        if self.request.method in permissions.SAFE_METHODS:
+            return [permissions.AllowAny()]
+        return [IsSellerOrReadOnly()]
 
     @swagger_auto_schema(
         operation_summary="List services",
@@ -83,7 +88,7 @@ class CategoryViewSet(ModelViewSet):
     
     def get_permissions(self):
         if self.request.method in permissions.SAFE_METHODS: 
-            return [permissions.IsAuthenticated()]
+            return [permissions.AllowAny()]
         return [permissions.IsAdminUser()]
     
     @swagger_auto_schema(
