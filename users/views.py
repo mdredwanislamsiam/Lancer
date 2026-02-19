@@ -1,6 +1,5 @@
-from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 from .models import User, IncomeOrCostPerMonth
-from .serializers import CustomUserSerializer, IncomeOrCostPerMonthSerializer
+from .serializers import CustomUserSerializer, IncomeOrCostPerMonthSerializer, SimpleUserSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from services.models import Service, Review
@@ -13,7 +12,10 @@ from orders.serializers import OrderSerializer
 class PublicUserView(APIView):
     def get(self, request, id): 
         user = User.objects.get(id = id)
-        return Response ({'user': CustomUserSerializer(user).data})
+        if(request.user.is_authenticated): 
+            return Response ({'user': CustomUserSerializer(user).data})
+        return Response({'user': SimpleUserSerializer(user).data})
+    
 
 
 class IncomeOrCostPerMonthViewSet(APIView):

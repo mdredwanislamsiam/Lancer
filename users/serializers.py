@@ -28,6 +28,11 @@ class CustomUserSerializer(UserSerializer):
         ref_name = 'CustomUser'
         read_only_fields = ['is_staff', 'wallet']
 
+class SimpleUserSerializer(UserSerializer): 
+    image = serializers.ImageField()
+    class Meta(UserSerializer.Meta): 
+        fields = ['id', 'username', 'image']
+        ref_name = 'SimpleUser'
 
 
 class IncomeOrCostPerMonthSerializer(serializers.ModelSerializer):

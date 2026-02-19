@@ -20,7 +20,7 @@ class ServiceViewSet(ModelViewSet):
 
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = ServiceFilter
-    search_fields = ['title']
+    search_fields = ['title', 'seller__username']
     ordering_fields = ['price']
     pagination_class = PageNumberPagination
     
