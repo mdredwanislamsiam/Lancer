@@ -10,14 +10,19 @@ class CustomUserCreateSerializer(UserCreateSerializer):
         fields = ['id', 'username', 'first_name', 'last_name', 'email', 'password',
                     'phone_number', 'address', 'image', 'bio', 'role']
       
-      
     def create(self, validated_data):
         role = validated_data.pop('role', None)
+
         user = super().create(validated_data)
-        group, _ = Group.objects.get_or_create(name = role)
-        user.groups.add(group)
+
+        if role:
+            user.role = role
+            group, _ = Group.objects.get_or_create(name=role)
+            user.groups.add(group)
+
+        user.save()
         return user
-    
+
 
 
 class CustomUserSerializer(UserSerializer):
