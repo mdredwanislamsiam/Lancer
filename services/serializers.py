@@ -26,7 +26,6 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class ServiceImageSerializer(serializers.ModelSerializer):
     images = serializers.ImageField()
-
     class Meta:
        model = ServiceImage
        fields = ['id', 'images']

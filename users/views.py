@@ -7,6 +7,8 @@ from orders.models import Order
 from rest_framework.response import Response
 from services.serializers import ServiceSerializer
 from orders.serializers import OrderSerializer
+from rest_framework import permissions
+
 
 
 class PublicUserView(APIView):
@@ -28,6 +30,7 @@ class IncomeOrCostPerMonthViewSet(APIView):
 
 
 class OtherInfo(APIView):
+    permission_classes = [permissions.IsAuthenticated]
     def get(self, request):
         user = self.request.user
         service_query = Service.objects.select_related(

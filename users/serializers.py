@@ -12,9 +12,7 @@ class CustomUserCreateSerializer(UserCreateSerializer):
       
     def create(self, validated_data):
         role = validated_data.pop('role', None)
-
         user = super().create(validated_data)
-
         if role:
             user.role = role
             group, _ = Group.objects.get_or_create(name=role)
